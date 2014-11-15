@@ -1,0 +1,10 @@
+[package]
+name = "rollup"
+version = "0.0.1"
+authors = ["Alex Crichton <alex.crichton@mozilla.com>", "Jakub Bukaj <jakub@jakub.cc>"]
+
+[dependencies.curl]
+git = "https://github.com/carllerche/curl-rust.git"
+
+[dependencies.docopt_macros]
+git = "git://github.com/docopt/docopt.rs"
