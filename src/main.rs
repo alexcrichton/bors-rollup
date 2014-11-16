@@ -38,6 +38,7 @@ struct User {
 struct Commit {
     user: User,
     repo: Repository,
+    body: String,
     sha: String,
     ref_: String
 }
@@ -165,6 +166,7 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
         head: Commit {
             user: User { login },
             repo: Repository { git_url },
+            body,
             ref_,
             sha
         },
@@ -172,7 +174,7 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
         ..
     } = pull_request;
 
-    let message = format!("rollup merge of #{}: {}/{}", number, login, ref_);
+    let message = format!("rollup merge of #{}: {}/{}\r\n\r\n{}", number, login, ref_, body);
     try!(git!("remote", "rm", login.as_slice()));
     try!(git!("remote", "add", login.as_slice(), git_url));
     try!(git!("fetch", login.as_slice(), ref_));
