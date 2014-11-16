@@ -1,4 +1,4 @@
-#![feature(if_let, macro_rules, phase)]
+#![feature(if_let, macro_rules, phase, slicing_syntax)]
  
 extern crate curl;
 extern crate docopt;
@@ -12,6 +12,7 @@ use curl::http;
 use docopt::Docopt;
 use error::Error;
 use serialize::{Decodable, Decoder, json};
+use std::collections::HashSet;
 use std::io::process::{Command, InheritFd};
 use std::io::stdio;
 use std::str;
@@ -64,6 +65,36 @@ struct PullRequest {
 
 pub type Response = Vec<PullRequest>;
 
+const BORS_STATUS_URL: &'static str = "http://buildbot.rust-lang.org/bors/bors-status.js";
+fn get_approved_prs() -> Result<HashSet<uint>, Error> {
+    println!("fetching approved PRs...");
+
+    let response = try!(http::handle()
+        .get(BORS_STATUS_URL)
+        .header("User-Agent", "bors roll-up")
+        .exec());
+    let string = try!(
+        str::from_utf8(response.get_body())
+            .ok_or(json::ApplicationError("Non UTF-8 response".to_string()))
+    );
+    let index = try!(string.find_str("var bors =")
+        .ok_or(json::ApplicationError("Unexpected status JSON shape".to_string())));
+
+    let json_str = string[(index + "var bors =".len())..string.len() - 2];
+    let approved_prs = try!(json::decode::<Vec<PullRequestStatus>>(json_str));
+    Ok(approved_prs
+        .into_iter()
+        .filter(|pr| pr.state.as_slice() == "APPROVED")
+        .map(|pr| pr.num)
+        .collect())
+}
+
+#[deriving(Decodable)]
+struct PullRequestStatus {
+    num: uint,
+    state: String
+}
+
 fn get_next_page_url(response: &http::Response) -> Option<String> {
     static REGEX: regex::Regex = regex!(r##"<([^>]*)>; rel="next""##);
     response.get_header("link")
@@ -76,6 +107,7 @@ fn get_next_page_url(response: &http::Response) -> Option<String> {
 
 fn fetch_page(url: &str) -> Result<Vec<PullRequest>, Error> {
     println!("fetching -- {}", url);
+
     let response = try!(http::handle()
         .get(url.as_slice())
         .header("User-Agent", "bors roll-up")
@@ -165,8 +197,10 @@ fn run() -> Result<(), Error> {
     let args: Args = docopt.decode().unwrap_or_else(|e| e.exit());
     let repository_name = args.arg_repository.as_slice();
 
+    let approved = try!(get_approved_prs());
     for pull_request in (try!(fetch(repository_name)))
         .into_iter()
+        .filter(|pr| approved.contains(&pr.number))
         .filter(|pr| pr.number >= args.flag_min.unwrap_or(0)) {
         match get_prompt(format!("merge #{} \"{}\"?", pull_request.number, pull_request.title).as_slice()) {
             Yes => (),
