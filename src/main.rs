@@ -38,7 +38,6 @@ struct User {
 struct Commit {
     user: User,
     repo: Repository,
-    body: String,
     sha: String,
     ref_: String
 }
@@ -61,7 +60,8 @@ impl <D: Decoder<E>, E> Decodable<D, E> for Commit {
 struct PullRequest {
     number: uint,
     title: String,
-    head: Commit
+    head: Commit,
+    body: String
 }
 
 pub type Response = Vec<PullRequest>;
@@ -166,11 +166,11 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
         head: Commit {
             user: User { login },
             repo: Repository { git_url },
-            body,
             ref_,
             sha
         },
         number,
+        body,
         ..
     } = pull_request;
 
