@@ -61,7 +61,7 @@ struct PullRequest {
     number: uint,
     title: String,
     head: Commit,
-    body: String
+    body: Option<String>
 }
 
 pub type Response = Vec<PullRequest>;
@@ -174,7 +174,8 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
         ..
     } = pull_request;
 
-    let message = format!("rollup merge of #{}: {}/{}\r\n\r\n{}", number, login, ref_, body);
+    let message = format!("rollup merge of #{}: {}/{}\r\n\r\n{}",
+        number, login, ref_, body.as_ref().map_or("", |s| s.as_slice()));
     try!(git!("remote", "rm", login.as_slice()));
     try!(git!("remote", "add", login.as_slice(), git_url));
     try!(git!("fetch", login.as_slice(), ref_));
