@@ -37,7 +37,7 @@ struct User {
 
 struct Commit {
     user: User,
-    repo: Repository,
+    repo: Option<Repository>,
     sha: String,
     ref_: String
 }
@@ -165,7 +165,7 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
     let PullRequest {
         head: Commit {
             user: User { login },
-            repo: Repository { git_url },
+            repo: repository,
             ref_,
             sha
         },
@@ -173,6 +173,11 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
         body,
         ..
     } = pull_request;
+
+    let git_url = match repository {
+        Some(Repository { git_url }) => git_url,
+        None => return Ok(())
+    };
 
     let message = format!("rollup merge of #{}: {}/{}\r\n\r\n{}",
         number, login, ref_, body.as_ref().map_or("", |s| s.as_slice()));
