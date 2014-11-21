@@ -1,5 +1,5 @@
 #![feature(if_let, macro_rules, phase, slicing_syntax)]
- 
+
 extern crate curl;
 extern crate docopt;
 extern crate libc;
@@ -129,7 +129,7 @@ fn fetch(repository: &str) -> Result<Vec<PullRequest>, Error> {
     let url: String = format!("https://api.github.com/repos/{}/pulls?direction=asc", repository);
     fetch_page(url.as_slice())
 }
- 
+
 macro_rules! git(
     ($($a:expr),*) => ({
         let mut cmd = Command::new("git");
