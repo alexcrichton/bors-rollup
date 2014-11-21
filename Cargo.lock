@@ -1,0 +1,66 @@
+[root]
+name = "rollup"
+version = "0.0.1"
+dependencies = [
+ "curl 0.1.0 (git+https://github.com/carllerche/curl-rust.git)",
+ "docopt_macros 0.6.8 (git+git://github.com/docopt/docopt.rs)",
+]
+
+[[package]]
+name = "curl"
+version = "0.1.0"
+source = "git+https://github.com/carllerche/curl-rust.git#c1b96e146f6752353a1e84cca932c628e6bf73af"
+dependencies = [
+ "curl-sys 0.1.0 (git+https://github.com/carllerche/curl-rust.git)",
+ "url 0.1.0 (git+https://github.com/servo/rust-url)",
+]
+
+[[package]]
+name = "curl-sys"
+version = "0.1.0"
+source = "git+https://github.com/carllerche/curl-rust.git#c1b96e146f6752353a1e84cca932c628e6bf73af"
+dependencies = [
+ "libz-sys 0.0.1 (git+https://github.com/alexcrichton/libz-sys)",
+ "openssl-sys 0.0.1 (git+https://github.com/sfackler/rust-openssl)",
+ "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
+]
+
+[[package]]
+name = "docopt"
+version = "0.6.8"
+source = "git+git://github.com/docopt/docopt.rs#be2e3b6b91ab1912d79f1e840d9397dead6e6a6e"
+
+[[package]]
+name = "docopt_macros"
+version = "0.6.8"
+source = "git+git://github.com/docopt/docopt.rs#be2e3b6b91ab1912d79f1e840d9397dead6e6a6e"
+dependencies = [
+ "docopt 0.6.8 (git+git://github.com/docopt/docopt.rs)",
+]
+
+[[package]]
+name = "libz-sys"
+version = "0.0.1"
+source = "git+https://github.com/alexcrichton/libz-sys#37926b786b09e013e5fd64cc278b3df1b49c4fbe"
+dependencies = [
+ "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
+]
+
+[[package]]
+name = "openssl-sys"
+version = "0.0.1"
+source = "git+https://github.com/sfackler/rust-openssl#efa71212432a9003d35fdae0e422716e6592b9ae"
+dependencies = [
+ "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
+]
+
+[[package]]
+name = "pkg-config"
+version = "0.0.1"
+source = "git+https://github.com/alexcrichton/pkg-config-rs#d24a08d87d63df8dc9526c503944415b86719220"
+
+[[package]]
+name = "url"
+version = "0.1.0"
+source = "git+https://github.com/servo/rust-url#a838a41263472de966f7ec8db758caa9cc4699a4"
+
