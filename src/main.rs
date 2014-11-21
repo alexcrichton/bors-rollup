@@ -14,7 +14,7 @@ use error::Error;
 use serialize::{Decodable, Decoder, json};
 use std::collections::HashSet;
 use std::io::process::{Command, InheritFd};
-use std::io::stdio;
+use std::io::{mod, stdio};
 use std::str;
 
 mod error;
@@ -137,7 +137,13 @@ macro_rules! git(
         println!("\x1b[38;5;106m$ {}\x1b[0m", cmd);
         cmd.stdout(InheritFd(libc::STDOUT_FILENO));
         cmd.stderr(InheritFd(libc::STDERR_FILENO));
-        cmd.status()
+        cmd.status().and_then(|status| {
+            if status.success() {
+                Ok(())
+            } else {
+                Err(io::standard_error(io::OtherIoError))
+            }
+        })
     })
 )
 
@@ -181,14 +187,13 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
 
     let message = format!("rollup merge of #{}: {}/{}\r\n\r\n{}",
         number, login, ref_, body.as_ref().map_or("", |s| s.as_slice()));
-    try!(git!("remote", "rm", login.as_slice()));
+    try!(git!("remote", "rm", login.as_slice()).or(Ok(())));
     try!(git!("remote", "add", login.as_slice(), git_url));
     try!(git!("fetch", login.as_slice(), ref_));
-    try!(git!("merge", "--no-ff", "-m", message, sha)
-        .or_else(|_| {
-            println!("\x1b[38;5;160m{}\x1b[0m", "couldn't merge");
-            git!("merge", "--abort")
-        }));
+    try!(git!("merge", "--no-ff", "-m", message, sha).or_else(|_| {
+        println!("\x1b[38;5;160m{}\x1b[0m", "couldn't merge");
+        git!("merge", "--abort")
+    }));
     try!(git!("remote", "rm", login.as_slice()));
     Ok(())
 }
