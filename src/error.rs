@@ -14,26 +14,26 @@ pub enum Error {
 }
 impl FromError<curl::ErrCode> for Error {
     fn from_error(error: curl::ErrCode) -> Error {
-        HTTPError(error)
+        Error::HTTPError(error)
     }
 }
 impl FromError<json::DecoderError> for Error {
     fn from_error(error: json::DecoderError) -> Error {
-        JSONDecoderError(error)
+        Error::JSONDecoderError(error)
     }
 }
 impl FromError<json::ParserError> for Error {
     fn from_error(error: json::ParserError) -> Error {
-        JSONParserError(error)
+        Error::JSONParserError(error)
     }
 }
 impl FromError<std::io::IoError> for Error {
     fn from_error(error: std::io::IoError) -> Error {
-        GitError(error)
+        Error::GitError(error)
     }
 }
 impl FromError<docopt::Error> for Error {
     fn from_error(error: docopt::Error) -> Error {
-        DocoptError(error)
+        Error::DocoptError(error)
     }
 }

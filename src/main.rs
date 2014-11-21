@@ -153,9 +153,9 @@ fn get_prompt(prompt: &str) -> Prompt {
         print!("{}\n[y/N/q]: ", prompt);
         let line = input.read_line().unwrap();
         match line.as_slice().trim() {
-            "y" | "Y" => return Yes,
-            "n" | "N" => return No,
-            "q" | "Q" => return Quit,
+            "y" | "Y" => return Prompt::Yes,
+            "n" | "N" => return Prompt::No,
+            "q" | "Q" => return Prompt::Quit,
             _ => continue
         }
     }
@@ -211,9 +211,9 @@ fn run() -> Result<(), Error> {
         .filter(|pr| approved.contains(&pr.number))
         .filter(|pr| pr.number >= args.flag_min.unwrap_or(0)) {
         match get_prompt(format!("merge #{} \"{}\"?", pull_request.number, pull_request.title).as_slice()) {
-            Yes => (),
-            No => continue,
-            Quit => break
+            Prompt::Yes => (),
+            Prompt::No => continue,
+            Prompt::Quit => break
         }
         try!(merge_pull_request(pull_request));
     }
