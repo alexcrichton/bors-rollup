@@ -194,10 +194,11 @@ fn merge_pull_request(pull_request: PullRequest) -> Result<(), Error> {
 }
 
 static USAGE: &'static str = "
-Usage: rollup <repository>
+Usage: rollup [options] <repository>
 
 Options:
-    -m, --min   # of the oldest PR to include.
+    -h, --help     # show this message
+    -m, --min MIN  # of the oldest PR to include.
 ";
 
 fn run() -> Result<(), Error> {
